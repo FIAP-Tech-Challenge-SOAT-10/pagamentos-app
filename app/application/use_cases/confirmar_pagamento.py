@@ -7,6 +7,7 @@ class confirmar_pagamento:
         if not pagamento:
             raise ValueError("Pagamento não encontrado")
 
-        pagamento.status = novo_status
-        self.pagamento_repository.update_pagamento(pagamento)
-        return pagamento
+        # ✅ Pydantic v1: use .copy(update={...})
+        pagamento_atualizado = pagamento.copy(update={"status": novo_status})
+        self.pagamento_repository.update_pagamento(pagamento_atualizado)
+        return pagamento_atualizado

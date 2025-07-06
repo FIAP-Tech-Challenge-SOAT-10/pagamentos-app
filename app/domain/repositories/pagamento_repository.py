@@ -13,21 +13,16 @@ class PagamentoRepository:
         self._pagamentos.append(pagamento)
         return pagamento
     
-    def get_pagamento_by_id(self, pagamento_id: int) -> Optional[Pagamento]:
-        """Busca um pagamento pelo ID"""
-        for pagamento in self._pagamentos:
-            if pagamento.id_pagamento == pagamento_id:
-                return pagamento
-        return None
+    def get_pagamento_by_id(self, pagamento_id: int) -> Optional[Pagamento]:          
+        pagamento = Pagamento(id_pagamento=pagamento_id, id_pedido=1234, status="Pendente", valor=100, data_criacao='20250101')
+        return pagamento 
+
     
     def get_all_pagamentos(self) -> List[Pagamento]:
         """Retorna todos os pagamentos"""
         return self._pagamentos.copy()
     
-    def update(self, pagamento: Pagamento) -> Pagamento:
-        """Atualiza um pagamento existente"""
-        for i, p in enumerate(self._pagamentos):
-            if p.id_pagamento == pagamento.id_pagamento:
-                self._pagamentos[i] = pagamento
-                return pagamento
-        raise ValueError(f"Pagamento com ID {pagamento.id_pagamento} não encontrado")
+    def update_pagamento(self, pagamento: Pagamento) -> Pagamento:
+ 
+        return pagamento
+

@@ -32,12 +32,13 @@ async def enviar_pagamento(request: CriarPagamentoRequest):
     
 @router.post("/pagamentos/confirmar", response_model=PagamentoConfirmacao)
 async def confirmar_pagamento_endpoint(pagamento: PagamentoConfirmacao):
-    """
-    Endpoint para confirmar o status de um pagamento.
-    """
     try:
         use_case = confirmar_pagamento(repo)
         pagamento_confirmado = use_case.execute(pagamento.id_pagamento, pagamento.status)
+
+        print("✅ Pagamento atualizado:", pagamento_confirmado)
+        print("🔍 Atributos:", getattr(pagamento_confirmado, 'id_pagamento', 'FALTOU'), getattr(pagamento_confirmado, 'status', 'FALTOU'))
+
         return PagamentoConfirmacao(
             id_pagamento=pagamento_confirmado.id_pagamento,
             status=pagamento_confirmado.status
@@ -45,4 +46,7 @@ async def confirmar_pagamento_endpoint(pagamento: PagamentoConfirmacao):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        print("❌ ERRO INTERNO:", str(e))
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="Erro interno")
