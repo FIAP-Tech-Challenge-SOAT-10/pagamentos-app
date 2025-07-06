@@ -8,3 +8,6 @@ class Pagamento(BaseModel):
     status: str = Field(..., description="Status do pagamento")
     data_criacao: datetime = Field(..., description="Data de criação do pagamento")
 
+class CriarPagamentoRequest(BaseModel):
+    id_pedido: str = Field(..., description="ID do pedido")
+    valor: float = Field(..., gt=0, description="Valor do pagamento (deve ser maior que 0)")
