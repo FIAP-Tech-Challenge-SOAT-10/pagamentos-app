@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 import random
+from interfaces.api.models import PagamentoConfirmacao
 from pydantic import BaseModel, Field, validator
 from domain.entities.pagamento import Pagamento
 from domain.repositories.pagamento_repository import PagamentoRepository
@@ -40,7 +41,21 @@ class EnviarPagamentoUseCase:
                 timeout=5
             )
             print("📥 Resposta do webhook:", response.status_code, response.text)
+
+            if response.status_code == 200:
+                # ✅ Extrai os dados do corpo JSON da resposta
+                response_data = response.json()
+
+                # ✅ Cria o objeto PagamentoConfirmacao com os dados do webhook
+                response_pagamento = PagamentoConfirmacao(
+                    id_pagamento=response_data.get("id_pagamento"),
+                    status=response_data.get("status", "Desconhecido")
+                )
+                return response_pagamento
+            else:
+                return None
+
         except Exception as e:
             print("❌ Falha ao enviar webhook:", str(e))
-
-        return pagamento
+            return None
+        

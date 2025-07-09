@@ -18,13 +18,13 @@ async def health_check():
     """
     return {"status": "ok"}
 
-@router.post("/pagamentos/enviar", response_model=PagamentoRequisicao)
+@router.post("/pagamentos/enviar", response_model=PagamentoConfirmacao)  
 async def enviar_pagamento(request: CriarPagamentoRequest):
     try:
         print("🟡 Requisição recebida:", request)
         pagamento = enviar_pagamento_use_case.execute(request.id_pedido, request.valor)
         print("🟢 Pagamento criado:", pagamento)
-        return PagamentoRequisicao(id_pagamento=pagamento.id_pagamento, status=pagamento.status, valor=pagamento.valor, data_criacao=pagamento.data_criacao)
+        return pagamento
     except Exception as e:
         print("🔴 Erro interno:", str(e))
         traceback.print_exc()
