@@ -1,6 +1,6 @@
 from app.infrastructure.services.webhook_service import WebhookService
 from fastapi import APIRouter, HTTPException
-from app.interfaces.api.models import PagamentoRequisicao, PagamentoConfirmacao, CriarPagamentoRequest
+from app.interfaces.api.models import PagamentoConfirmacao, CriarPagamentoRequest
 from app.application.use_cases.enviar_pagamento import EnviarPagamentoUseCase
 from app.application.use_cases.confirmar_pagamento import confirmar_pagamento
 from app.domain.repositories.pagamento_repository import PagamentoRepository
