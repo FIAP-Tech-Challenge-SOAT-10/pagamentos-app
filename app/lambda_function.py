@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from interfaces.api.routes import router
+from app.interfaces.api.routes import router
 from mangum import Mangum
 
 # Corrige o roteamento via API Gateway (stage "v1")

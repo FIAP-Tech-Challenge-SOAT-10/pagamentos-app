@@ -3,7 +3,7 @@ from decimal import Decimal
 import boto3
 from boto3.dynamodb.conditions import Key
 from typing import List, Optional
-from domain.entities.pagamento import Pagamento
+from app.domain.entities.pagamento import Pagamento
 
 
 class PagamentoRepository:
