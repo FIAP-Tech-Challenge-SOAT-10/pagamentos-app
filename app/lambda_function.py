@@ -7,15 +7,8 @@ app = FastAPI(root_path="/v1")
 
 # Rotas
 app.include_router(router)
-
-# def handler(event, context):
-#     print("Event:", event)
-#     print("Context:", context)
-#     return {
-#         "statusCode": 200,
-#         "body": f'Debugging Lambda function: {event}, {context}'
-#     }
-
+# Configuração do Mangum para AWS Lambda
+# Isso permite que o FastAPI funcione como um handler para AWS Lambda
 # AWS Lambda handler
 handler = Mangum(app)
 
