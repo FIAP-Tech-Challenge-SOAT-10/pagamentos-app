@@ -4,7 +4,7 @@ import random
 from interfaces.api.models import PagamentoConfirmacao
 from pydantic import BaseModel, Field, validator
 from domain.entities.pagamento import Pagamento
-from domain.repositories.pagamento_repository import PagamentoRepository
+from infrastructure.repositories.pagamento_repository import PagamentoRepository
 import requests
 
 class EnviarPagamentoUseCase:
@@ -23,6 +23,8 @@ class EnviarPagamentoUseCase:
 
         # ✅ Salvando no DynamoDB (assumindo que o repositório converte .isoformat() e Decimal)
         self.pagamento_repository.save(pagamento)
+
+        self.publisher.publish_pagamento_event("pagamento_criado", pagamento.dict())
 
         # ✅ Preparando o payload do webhook
         webhook_payload = {

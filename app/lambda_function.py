@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from interfaces.api.routes import router
 from mangum import Mangum
+from dotenv import load_dotenv
+load_dotenv()
 
 # Corrige o roteamento via API Gateway (stage "v1")
 app = FastAPI(root_path="/v1")

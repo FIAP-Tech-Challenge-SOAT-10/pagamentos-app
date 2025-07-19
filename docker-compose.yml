@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  localstack:
+    image: localstack/localstack:3.0
+    container_name: localstack
+    ports:
+      - "4566:4566"  # Porta para todos os serviços (SQS, SNS, S3, etc.)
+      - "4571:4571"
+    environment:
+      - SERVICES=sqs
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - ./localstack-init:/etc/localstack/init/ready.d  # scripts de inicialização
+      - /var/run/docker.sock:/var/run/docker.sock
