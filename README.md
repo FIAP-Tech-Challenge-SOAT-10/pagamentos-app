@@ -63,3 +63,65 @@ Na raiz do projeto, execute:
 
 ```bash
 docker-compose up -d
+```
+
+Esse comando iniciará o LocalStack e criará automaticamente a fila `pagamento-events`.
+
+### 2. Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
+
+```env
+USE_LOCALSTACK=true
+SQS_PAGAMENTO_URL=http://localhost:4566/000000000000/pagamento-events
+```
+
+> Certifique-se de que o código está carregando o `.env` com `dotenv.load_dotenv()` na inicialização da aplicação.
+
+### 3. Rodar localmente
+
+Com o LocalStack rodando, execute a aplicação localmente com Uvicorn:
+
+```bash
+uvicorn interfaces.lambda_function:app --reload
+```
+
+A aplicação estará disponível em `http://localhost:8000/v1`
+
+### 4. Testar o envio de um pagamento
+
+Faça uma requisição para criar um pagamento (como feito na AWS):
+
+```bash
+curl -X POST http://localhost:8000/v1/pagamentos/enviar \
+  -H "Content-Type: application/json" \
+  -d '{"id_pedido": "123456", "valor": 25.90}'
+```
+
+### 5. Verificar mensagens na fila
+
+Após um `UPDATE` de pagamento ou confirmação, você pode verificar as mensagens publicadas no SQS:
+
+```bash
+awslocal sqs receive-message \
+  --queue-url http://localhost:4566/000000000000/pagamento-events
+```
+
+### Estrutura de publicação de eventos
+
+Quando um pagamento é confirmado, o evento publicado segue o formato:
+
+```json
+{
+  "event_type": "pagamento_confirmado",
+  "data": {
+    "id_pagamento": 459371,
+    "id_pedido": "7598432",
+    "valor": 43.2,
+    "status": "Confirmado",
+    "data_criacao": "2025-07-19T13:32:00"
+  }
+}
+```
+
+Outros microsserviços podem consumir essa fila e sincronizar seus próprios bancos de dados sem depender diretamente do serviço de pagamentos.
