@@ -19,7 +19,7 @@ async def health_check():
 @router.post("/pagamentos/enviar", response_model=PagamentoConfirmacao)
 async def enviar_pagamento(request: CriarPagamentoRequest):
     try:
-        repo = PagamentoRepository()  # ✅ agora dentro do escopo do handler
+        repo = PagamentoRepository()  
         webhook = WebhookService()
         use_case = EnviarPagamentoUseCase(repo, webhook)
 
@@ -39,7 +39,7 @@ async def confirmar_pagamento_endpoint(pagamento: PagamentoConfirmacao):
     try:
         print("📥 Requisição recebida:", pagamento)
 
-        repo = PagamentoRepository()  # ✅ também movido para cá
+        repo = PagamentoRepository() 
         use_case = confirmar_pagamento(repo)
 
         print("🔄 Chamando use_case.execute...")
