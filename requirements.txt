@@ -4,3 +4,5 @@ mangum>=0.17.0
 requests>=2.31.0
 boto3
 httpx
+pytest>=7.4.0
+pytest-cov
