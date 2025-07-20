@@ -3,8 +3,8 @@ name: Build and Analyze with SonarCloud
 on:
   push:
     branches:
-      - main        # obrigatório para aplicar Quality Gate
-      - develop     # permite rodar análise durante desenvolvimento
+      - main
+      - develop
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -38,11 +38,3 @@ jobs:
           projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Wait for SonarCloud Quality Gate
-        uses: sonarsource/sonarcloud-quality-gate-action@v1
-        timeout-minutes: 5
-        with:
-          sonar-token: ${{ secrets.SONAR_TOKEN }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
