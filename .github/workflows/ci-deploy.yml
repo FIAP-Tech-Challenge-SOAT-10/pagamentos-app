@@ -18,19 +18,16 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt -t lambda_package
-
-      - name: Copy application files
+      - name: Install dependencies and copy app
         run: |
           mkdir -p lambda_package/app
           cp -r app/* lambda_package/app/
+          pip install -r requirements.txt -t lambda_package
 
-      - name: Create zip package
+      - name: Create zip package (ZIP only content of lambda_package)
         run: |
-          zip -r function.zip lambda_package/*
+          cd lambda_package
+          zip -r ../function.zip .
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -45,9 +42,9 @@ jobs:
             --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
             --zip-file fileb://function.zip
 
-      - name: Wait for Lambda to be ready
+      - name: Wait for Lambda update to complete
         run: |
-          echo "Waiting for Lambda update to complete..."
+          echo "Waiting for Lambda to become ready..."
           while true; do
             STATUS=$(aws lambda get-function-configuration \
               --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
@@ -57,7 +54,7 @@ jobs:
               echo "Lambda is ready."
               break
             fi
-            echo "Current status: $STATUS. Retrying in 5s..."
+            echo "Current status: $STATUS... retrying in 5s"
             sleep 5
           done
 
@@ -66,4 +63,3 @@ jobs:
           aws lambda update-function-configuration \
             --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
             --handler "app.lambda_function.handler"
-
