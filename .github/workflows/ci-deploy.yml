@@ -9,6 +9,10 @@ jobs:
     name: Build and Deploy Lambda
     runs-on: ubuntu-latest
 
+    env:  # 👈 ADICIONE ISSO AQUI
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
