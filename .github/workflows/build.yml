@@ -25,9 +25,9 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          coverage run -m pytest
+          pip install behave coverage
+          coverage run -m behave features/
           coverage xml
-          ls -lh coverage.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
