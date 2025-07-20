@@ -1,14 +1,16 @@
-name: Build
+name: Build and Analyze with SonarCloud
+
 on:
   push:
     branches:
-      - develop
+      - main        # necessário para acionar Quality Gate de verdade
+      - develop     # para permitir builds em PRs
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    name: Build and analyze
+    name: Build and SonarCloud Analysis
     runs-on: ubuntu-latest
 
     steps:
@@ -38,10 +40,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Wait for SonarCloud Quality Gate
-        uses: SonarSource/sonarcloud-quality-gate-action@master
+        uses: SonarSource/sonarcloud-quality-gate-action@v1
         timeout-minutes: 5
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
