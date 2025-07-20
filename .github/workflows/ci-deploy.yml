@@ -1,0 +1,70 @@
+name: Deploy Lambda on PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy:
+    name: Build and Deploy Lambda
+    runs-on: ubuntu-latest
+
+    env:  # 👈 ADICIONE ISSO AQUI
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-default-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install dependencies and copy app
+        run: |
+          mkdir -p lambda_package/app
+          cp -r app/* lambda_package/app/
+          pip install -r requirements.txt -t lambda_package
+
+      - name: Create zip package (ZIP only content of lambda_package)
+        run: |
+          cd lambda_package
+          zip -r ../function.zip .
+
+      - name: Deploy to AWS Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+            --zip-file fileb://function.zip
+
+      - name: Wait for Lambda update to complete
+        run: |
+          echo "Waiting for Lambda to become ready..."
+          while true; do
+            STATUS=$(aws lambda get-function-configuration \
+              --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+              --query 'LastUpdateStatus' \
+              --output text)
+            if [ "$STATUS" = "Successful" ]; then
+              echo "Lambda is ready."
+              break
+            fi
+            echo "Current status: $STATUS... retrying in 5s"
+            sleep 5
+          done
+
+      - name: Update Lambda handler
+        run: |
+          aws lambda update-function-configuration \
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+            --handler "app.lambda_function.handler"
