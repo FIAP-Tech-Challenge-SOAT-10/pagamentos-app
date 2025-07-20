@@ -4,7 +4,7 @@ from app.domain.repositories.pagamento_repository import PagamentoRepository
 from app.infrastructure.services.webhook_service import WebhookService
 from datetime import datetime
 from decimal import Decimal
-import random
+import secrets
 
 class EnviarPagamentoUseCase:
     def __init__(
@@ -16,8 +16,10 @@ class EnviarPagamentoUseCase:
         self.webhook_service = webhook_service
 
     def execute(self, id_pedido: str, valor: Decimal) -> PagamentoConfirmacao | None:
+        id_pagamento = secrets.randbelow(900000) + 100000  # int seguro de 6 dígitos
+
         pagamento = Pagamento(
-            id_pagamento=random.randint(100000, 999999),
+            id_pagamento=id_pagamento,
             id_pedido=id_pedido,
             valor=valor,
             status="Pendente",
