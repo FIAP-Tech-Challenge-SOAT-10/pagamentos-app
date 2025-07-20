@@ -25,7 +25,7 @@ jobs:
 
       - name: Run behave with coverage
         run: |
-          coverage run -m pytest
+          coverage run -m pytest app/tests
           coverage run --append -m behave features/
           coverage xml
 
