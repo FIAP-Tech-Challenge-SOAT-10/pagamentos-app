@@ -15,7 +15,9 @@ Para realizar o deploy da Lambda na AWS, execute o script abaixo:
 
 .\deploy.ps1
 
-🧪 Teste da API
+---
+
+## 🧪 Teste da API
 Você pode testar a API com o endpoint público:
 
 Endpoint: https://qjy8d5de2c.execute-api.us-east-1.amazonaws.com/v1/pagamentos/enviar
@@ -42,7 +44,9 @@ A resposta indicará se o pagamento foi Recebido ou Negado, simulando o comporta
 
 ---
 
-🛠 Tecnologias utilizadas
+## 🛠 Tecnologias utilizadas
+
+
 
 * FastAPI
 
@@ -58,7 +62,7 @@ A resposta indicará se o pagamento foi Recebido ou Negado, simulando o comporta
 
 ---
 
-📊 Qualidade de código
+## 📊 Qualidade de código
 
 Este projeto utiliza o SonarCloud para verificar:
 
