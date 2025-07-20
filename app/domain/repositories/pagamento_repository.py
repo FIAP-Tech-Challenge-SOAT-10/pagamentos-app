@@ -7,10 +7,11 @@ from app.domain.entities.pagamento import Pagamento
 
 
 class PagamentoRepository:
-    def __init__(self):
-        self.dynamodb = boto3.resource("dynamodb")
+    def __init__(self, dynamodb_resource=None):
+        self.dynamodb = dynamodb_resource or boto3.resource("dynamodb")
         self.table = self.dynamodb.Table("pagamentos")
-
+        print("🔗 Conectado à tabela DynamoDB:", self.table.name)
+        
     def save(self, pagamento: Pagamento) -> Pagamento:
         """Salva um pagamento no DynamoDB"""
         self.table.put_item(

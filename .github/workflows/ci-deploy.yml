@@ -9,6 +9,10 @@ jobs:
     name: Build and Deploy Lambda
     runs-on: ubuntu-latest
 
+    env:  # 👈 ADICIONE ISSO AQUI
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,6 +21,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-default-region: ${{ secrets.AWS_REGION }}
 
       - name: Install dependencies and copy app
         run: |
@@ -28,13 +40,6 @@ jobs:
         run: |
           cd lambda_package
           zip -r ../function.zip .
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to AWS Lambda
         run: |
