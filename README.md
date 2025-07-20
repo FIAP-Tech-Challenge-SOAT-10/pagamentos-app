@@ -13,7 +13,10 @@ API para processamento de pagamentos desenvolvida com **FastAPI**, utilizando ar
 Para realizar o deploy da Lambda na AWS, execute o script abaixo:
 
 
+```powershell
 .\deploy.ps1
+```
+
 
 ---
 
