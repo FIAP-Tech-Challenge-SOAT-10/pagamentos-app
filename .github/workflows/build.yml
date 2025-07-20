@@ -21,11 +21,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install coverage pytest
-
-      - name: Run tests and generate coverage report
-        run: |
           pip install behave coverage
+
+      - name: Run behave with coverage
+        run: |
           coverage run -m behave features/
           coverage xml
 
