@@ -14,10 +14,11 @@ Para realizar o deploy da Lambda na AWS, execute o script abaixo:
 
 
 .\deploy.ps1
+
 🧪 Teste da API
 Você pode testar a API com o endpoint público:
 
-URL: https://qjy8d5de2c.execute-api.us-east-1.amazonaws.com/v1/pagamentos/enviar
+Endpoint: https://qjy8d5de2c.execute-api.us-east-1.amazonaws.com/v1/pagamentos/enviar
 
 Método: POST
 
@@ -39,20 +40,26 @@ Método: POST
 
 A resposta indicará se o pagamento foi Recebido ou Negado, simulando o comportamento da integração com um sistema financeiro.
 
+---
+
 🛠 Tecnologias utilizadas
-FastAPI
 
-AWS Lambda
+* FastAPI
 
-Amazon API Gateway
+* AWS Lambda
 
-GitHub Actions
+* Amazon API Gateway
 
-SonarCloud
+* GitHub Actions
 
-Behave + coverage.py
+* SonarCloud
+
+* Behave + coverage.py
+
+---
 
 📊 Qualidade de código
+
 Este projeto utiliza o SonarCloud para verificar:
 
 ✅ Cobertura de testes
