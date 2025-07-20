@@ -12,7 +12,7 @@ API para processamento de pagamentos desenvolvida com **FastAPI**, utilizando ar
 
 Para realizar o deploy da Lambda na AWS, execute o script abaixo:
 
-```powershell
+
 .\deploy.ps1
 🧪 Teste da API
 Você pode testar a API com o endpoint público:
@@ -22,16 +22,21 @@ URL: https://qjy8d5de2c.execute-api.us-east-1.amazonaws.com/v1/pagamentos/enviar
 Método: POST
 
 🔸 Exemplo de requisição:
+```json
 {
   "id_pedido": "7598432",
   "valor": 43.20
 }
+```
 
 🔸 Exemplo de resposta:
+```json
 {
   "id_pagamento": 459371,
   "status": "Recebido"
 }
+```
+
 A resposta indicará se o pagamento foi Recebido ou Negado, simulando o comportamento da integração com um sistema financeiro.
 
 🛠 Tecnologias utilizadas
