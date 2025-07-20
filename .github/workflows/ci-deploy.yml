@@ -45,8 +45,25 @@ jobs:
             --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
             --zip-file fileb://function.zip
 
+      - name: Wait for Lambda to be ready
+        run: |
+          echo "Waiting for Lambda update to complete..."
+          while true; do
+            STATUS=$(aws lambda get-function-configuration \
+              --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+              --query 'LastUpdateStatus' \
+              --output text)
+            if [ "$STATUS" = "Successful" ]; then
+              echo "Lambda is ready."
+              break
+            fi
+            echo "Current status: $STATUS. Retrying in 5s..."
+            sleep 5
+          done
+
       - name: Update Lambda handler
         run: |
           aws lambda update-function-configuration \
             --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
             --handler "app.lambda_function.handler"
+
