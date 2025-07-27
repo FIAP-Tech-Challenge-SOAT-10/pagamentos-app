@@ -26,7 +26,7 @@ jobs:
       - name: Run behave with coverage
         run: |
           coverage run -m pytest tests
-          coverage run --append -m behave features/
+          coverage run --append -m behave features
           coverage xml
 
       - name: SonarCloud Scan
