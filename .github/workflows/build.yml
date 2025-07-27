@@ -23,11 +23,9 @@ jobs:
           pip install -r requirements.txt
           pip install behave coverage
 
-      - name: Run behave with coverage
+      - name: Run tests with pytest
         run: |
-          coverage run -m pytest tests
-          coverage run --append -m behave features
-          coverage xml
+          pytest --cov=app --cov-report=xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
