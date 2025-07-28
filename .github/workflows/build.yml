@@ -3,6 +3,8 @@ name: CI - Análise e Deploy Lambda
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - main
 
 jobs:
   analyze:
