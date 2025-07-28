@@ -1,4 +1,4 @@
-from infrastructure.queue.publisher import SQSPublisher 
+from app.infrastructure.queue.publisher import SQSPublisher 
 
 class confirmar_pagamento:
     def __init__(self, pagamento_repository):
