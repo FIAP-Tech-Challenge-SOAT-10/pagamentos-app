@@ -9,13 +9,17 @@ from decimal import Decimal
 
 @pytest.mark.asyncio
 async def test_health_check():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    from httpx import ASGITransport
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
 @pytest.mark.asyncio
 async def test_enviar_pagamento(monkeypatch):
+    from httpx import ASGITransport
+    transport = ASGITransport(app=app)
     # Mock da response do webhook
     mock_webhook = MagicMock()
     mock_response = PagamentoConfirmacao(id_pagamento=123456, status="Pendente")
@@ -34,7 +38,7 @@ async def test_enviar_pagamento(monkeypatch):
         "valor": "150.00"
     }
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post("/pagamentos/enviar", json=payload)
 
     assert response.status_code == 200
@@ -67,7 +71,9 @@ async def test_enviar_pagamento_erro_interno(monkeypatch):
         "valor": "150.00"
     }
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    from httpx import ASGITransport
+    transport=transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post("/pagamentos/enviar", json=payload)
 
     assert response.status_code == 500
@@ -96,7 +102,9 @@ async def test_confirmar_pagamento(monkeypatch):
         "status": "Confirmado"
     }
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    from httpx import ASGITransport
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post("/pagamentos/confirmar", json=payload)
 
     assert response.status_code == 200
@@ -119,7 +127,9 @@ async def test_confirmar_pagamento_nao_encontrado(monkeypatch):
         "status": "Confirmado"
     }
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    from httpx import ASGITransport
+    transport=transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post("/pagamentos/confirmar", json=payload)
 
     assert response.status_code == 404
@@ -138,7 +148,9 @@ async def test_confirmar_pagamento_erro_interno(monkeypatch):
         "status": "Confirmado"
     }
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    from httpx import ASGITransport
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post("/pagamentos/confirmar", json=payload)
 
     assert response.status_code == 500
