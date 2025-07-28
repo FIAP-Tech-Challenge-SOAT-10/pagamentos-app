@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
-      - main
+      - main  # Só executa PRs direcionados para a branch main
 
 jobs:
   analyze:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # necessário para análise correta pelo SonarCloud
+          fetch-depth: 0  # Necessário para o SonarCloud comparar código novo
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,7 +29,7 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          pytest --cov=app --cov-report=xml
+          pytest --cov=. --cov-report=xml --cov-config=setup.cfg
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
@@ -38,12 +38,12 @@ jobs:
           projectKey: FIAP-Tech-Challenge-SOAT-10_pagamentos-app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Necessário para vincular PR
 
   deploy:
     name: Build and Deploy Lambda
     runs-on: ubuntu-latest
-    needs: analyze
+    needs: analyze  # Só executa se a etapa de análise for bem-sucedida
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -85,7 +85,7 @@ jobs:
       - name: Wait for Lambda update to complete
         run: |
           echo "Waiting for Lambda to become ready..."
-          while true; do
+          for i in {1..12}; do
             STATUS=$(aws lambda get-function-configuration \
               --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
               --query 'LastUpdateStatus' \
@@ -103,4 +103,3 @@ jobs:
           aws lambda update-function-configuration \
             --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
             --handler "app.lambda_function.handler"
-
