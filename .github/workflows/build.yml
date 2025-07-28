@@ -23,7 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests with pytest
+      - name: Run tests and generate coverage report
         run: |
           pytest --cov=app --cov-report=xml
 
@@ -34,6 +34,7 @@ jobs:
           projectKey: FIAP-Tech-Challenge-SOAT-10_pagamentos-app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     name: Build and Deploy Lambda
@@ -98,3 +99,4 @@ jobs:
           aws lambda update-function-configuration \
             --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
             --handler "app.lambda_function.handler"
+
