@@ -3,6 +3,8 @@ name: Deploy Lambda on PR
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - main
 
 jobs:
   deploy:
