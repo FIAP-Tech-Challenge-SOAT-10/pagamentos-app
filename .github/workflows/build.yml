@@ -68,3 +68,35 @@ jobs:
           pip install -r requirements.txt -t lambda_package
 
       - name: Create zip package
+        run: |
+          cd lambda_package
+          zip -r ../function.zip .
+
+      - name: Deploy to AWS Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+            --zip-file fileb://function.zip
+
+      - name: Wait for Lambda update to complete
+        run: |
+          echo "Waiting for Lambda to become ready..."
+          while true; do
+            STATUS=$(aws lambda get-function-configuration \
+              --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+              --query 'LastUpdateStatus' \
+              --output text)
+            if [ "$STATUS" = "Successful" ]; then
+              echo "Lambda is ready."
+              break
+            fi
+            echo "Current status: $STATUS... retrying in 5s"
+            sleep 5
+          done
+
+      - name: Update Lambda handler
+        run: |
+          aws lambda update-function-configuration \
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+            --handler "app.lambda_function.handler"
+
