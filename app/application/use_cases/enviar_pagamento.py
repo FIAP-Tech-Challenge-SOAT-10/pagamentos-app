@@ -4,7 +4,7 @@ from app.infrastructure.services.webhook_service import WebhookService
 from datetime import datetime
 from decimal import Decimal
 import random
-from interfaces.api.models import PagamentoConfirmacao
+from app.interfaces.api.models import PagamentoConfirmacao
 from pydantic import BaseModel, Field, validator
 from app.domain.entities.pagamento import Pagamento
 from app.infrastructure.repositories.pagamento_repository import PagamentoRepository

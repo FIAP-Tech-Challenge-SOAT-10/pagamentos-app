@@ -4,7 +4,7 @@ from fastapi import status
 from app.lambda_function import app  
 from app.domain.entities.pagamento import Pagamento
 from app.interfaces.api.models import PagamentoConfirmacao
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from decimal import Decimal
 
 @pytest.mark.asyncio
@@ -28,6 +28,12 @@ async def test_enviar_pagamento(monkeypatch):
     # Mock do repositório
     mock_repo = MagicMock()
     mock_repo.save.return_value = None
+
+    mock_sqs = MagicMock()
+    # Monkeypatch no método get_sqs_client
+    monkeypatch.setattr("app.infrastructure.queue.publisher.get_sqs_client", lambda: mock_sqs)
+
+    monkeypatch.setenv("PAGAMENTO_QUEUE_URL", "https://mock-queue-url")
 
     # Override das dependências no escopo do teste
     monkeypatch.setattr("app.interfaces.api.routes.PagamentoRepository", lambda: mock_repo)
@@ -93,7 +99,12 @@ async def test_confirmar_pagamento(monkeypatch):
     # Mock do repositório com pagamento existente
     mock_repo = MagicMock()
     mock_repo.get_pagamento_by_id.return_value = mock_pagamento
-    mock_repo.update_pagamento.return_value = None
+    
+    mock_sqs = MagicMock()
+    # Monkeypatch no método get_sqs_client
+    monkeypatch.setattr("app.infrastructure.queue.publisher.get_sqs_client", lambda: mock_sqs)
+
+    monkeypatch.setenv("PAGAMENTO_QUEUE_URL", "https://mock-queue-url")
 
     monkeypatch.setattr("app.interfaces.api.routes.PagamentoRepository", lambda: mock_repo)
 

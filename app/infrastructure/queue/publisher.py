@@ -1,23 +1,32 @@
 import json
+from decimal import Decimal
+from datetime import datetime
+
+from app.infrastructure.queue.boto3_client import get_sqs_client
+
 import os
-from infrastructure.config.boto3_client import get_sqs_client
 
 class SQSPublisher:
     def __init__(self):
-        self.sqs = get_sqs_client()
-        self.queue_url = os.environ.get("SQS_PAGAMENTO_URL")  # ex: http://localhost:4566/000000000000/pagamento-events
+        self.client = get_sqs_client()
+        self.queue_url = os.environ.get("PAGAMENTO_QUEUE_URL")
 
     def publish_pagamento_event(self, event_type: str, data: dict):
         message = {
             "event_type": event_type,
-            "data": data
+            "data": data,
         }
+
+        def default_serializer(obj):
+            if isinstance(obj, Decimal):
+                return str(obj)
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
         print("📤 Publicando mensagem no SQS:", message)
 
-        response = self.sqs.send_message(
+        self.client.send_message(
             QueueUrl=self.queue_url,
-            MessageBody=json.dumps(message)
+            MessageBody=json.dumps(message, default=default_serializer),
         )
-
-        print("📬 Mensagem publicada. MessageId:", response.get("MessageId"))

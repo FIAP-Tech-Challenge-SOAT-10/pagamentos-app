@@ -1,9 +1,10 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from decimal import Decimal
 from app.application.use_cases.enviar_pagamento import EnviarPagamentoUseCase
 from app.domain.entities.pagamento import Pagamento
 from app.interfaces.api.models import PagamentoConfirmacao
+
 
 @pytest.fixture
 def mock_repository():
@@ -13,12 +14,21 @@ def mock_repository():
 def mock_webhook_service():
     return MagicMock()
 
+
 @pytest.fixture
-def use_case(mock_repository, mock_webhook_service):
+def mock_publisher():
+    """Mocka o SQSPublisher antes de instanciar o use case."""
+    with patch("app.application.use_cases.enviar_pagamento.SQSPublisher") as mock:
+        yield mock
+
+
+@pytest.fixture
+def use_case(mock_repository, mock_webhook_service, mock_publisher):
     return EnviarPagamentoUseCase(
         pagamento_repository=mock_repository,
         webhook_service=mock_webhook_service
     )
+
 
 def test_enviar_pagamento_sucesso(use_case, mock_repository, mock_webhook_service):
     id_pedido = "ABC123"
@@ -42,6 +52,7 @@ def test_enviar_pagamento_sucesso(use_case, mock_repository, mock_webhook_servic
 
     # Verifica retorno
     assert result == retorno_webhook
+
 
 def test_enviar_pagamento_webhook_retorna_none(use_case, mock_repository, mock_webhook_service):
     id_pedido = "XYZ999"
