@@ -60,6 +60,11 @@ async def test_enviar_pagamento_erro_interno(monkeypatch):
     mock_webhook = MagicMock()
     mock_repo = MagicMock()
 
+    mock_sqs = MagicMock()
+    # Monkeypatch no método get_sqs_client
+    monkeypatch.setattr("app.infrastructure.queue.publisher.get_sqs_client", lambda: mock_sqs)
+    monkeypatch.setenv("PAGAMENTO_QUEUE_URL", "https://mock-queue-url")
+
     # Mock do UseCase que lança exceção
     mock_use_case = MagicMock()
     mock_use_case.execute.side_effect = Exception("Simulated failure")
@@ -130,6 +135,12 @@ async def test_confirmar_pagamento_nao_encontrado(monkeypatch):
     mock_repo = MagicMock()
     mock_repo.get_pagamento_by_id.return_value = None
 
+    mock_sqs = MagicMock()
+    # Monkeypatch no método get_sqs_client
+    monkeypatch.setattr("app.infrastructure.queue.publisher.get_sqs_client", lambda: mock_sqs)
+
+    monkeypatch.setenv("PAGAMENTO_QUEUE_URL", "https://mock-queue-url")
+
     # Patch da dependência
     monkeypatch.setattr("app.interfaces.api.routes.PagamentoRepository", lambda: mock_repo)
 
@@ -151,6 +162,12 @@ async def test_confirmar_pagamento_erro_interno(monkeypatch):
     # Mock do repositório com exceção
     mock_repo = MagicMock()
     mock_repo.get_pagamento_by_id.side_effect = Exception("Erro inesperado")
+
+    mock_sqs = MagicMock()
+    # Monkeypatch no método get_sqs_client
+    monkeypatch.setattr("app.infrastructure.queue.publisher.get_sqs_client", lambda: mock_sqs)
+
+    monkeypatch.setenv("PAGAMENTO_QUEUE_URL", "https://mock-queue-url")
 
     monkeypatch.setattr("app.interfaces.api.routes.PagamentoRepository", lambda: mock_repo)
 
