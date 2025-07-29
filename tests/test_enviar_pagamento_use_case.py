@@ -64,4 +64,6 @@ def test_enviar_pagamento_webhook_retorna_none(use_case, mock_repository, mock_w
     # Deve salvar e tentar enviar mesmo assim
     assert mock_repository.save.call_count == 1
     assert mock_webhook_service.enviar.call_count == 1
-    assert result is None
+    assert result is not None
+    assert result.id_pagamento is not None
+    assert result.status == "Desconhecido"
