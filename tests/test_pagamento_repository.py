@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from unittest.mock import MagicMock
 from app.domain.entities.pagamento import Pagamento
-from app.domain.repositories.pagamento_repository import PagamentoRepository
+from app.infrastructure.repositories.pagamento_repository import PagamentoRepository
 
 
 @pytest.fixture

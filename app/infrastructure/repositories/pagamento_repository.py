@@ -4,11 +4,23 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from typing import List, Optional
 from app.domain.entities.pagamento import Pagamento
-
+import os
 
 class PagamentoRepository:
     def __init__(self, dynamodb_resource=None):
-        self.dynamodb = dynamodb_resource or boto3.resource("dynamodb")
+        if dynamodb_resource:
+            self.dynamodb = dynamodb_resource
+        else:
+            if os.environ.get("USE_LOCALSTACK", "false").lower() == "true":
+                self.dynamodb = boto3.resource(
+                    "dynamodb",
+                    endpoint_url="http://localhost:4566",
+                    aws_access_key_id="fake_access_key",
+                    aws_secret_access_key="fake_secret_key",
+                    region_name="us-east-1",
+                )
+            else:
+                self.dynamodb = boto3.resource("dynamodb")
         self.table = self.dynamodb.Table("pagamentos")
         print("🔗 Conectado à tabela DynamoDB:", self.table.name)
         

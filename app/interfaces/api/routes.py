@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from app.interfaces.api.models import PagamentoConfirmacao, CriarPagamentoRequest
 from app.application.use_cases.enviar_pagamento import EnviarPagamentoUseCase
 from app.application.use_cases.confirmar_pagamento import confirmar_pagamento
-from app.domain.repositories.pagamento_repository import PagamentoRepository
+from app.infrastructure.repositories.pagamento_repository import PagamentoRepository
 import traceback
 
 router = APIRouter()
