@@ -37,4 +37,11 @@ class EnviarPagamentoUseCase:
 
         self.publisher.publish_pagamento_event("pagamento_criado", pagamento.dict())
 
-        return self.webhook_service.enviar(pagamento)
+        confirmacao = self.webhook_service.enviar(pagamento)
+        if confirmacao is None:
+            # Retorna um objeto padrão com status de erro ou pendente
+            return PagamentoConfirmacao(
+                id_pagamento=pagamento.id_pagamento,
+                status="Desconhecido"
+            )
+        return confirmacao

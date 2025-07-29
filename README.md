@@ -97,52 +97,125 @@ Para testar o serviço localmente com a simulação da fila SQS, siga os passos 
 
 ### 1. Subir o ambiente com LocalStack
 
-Na raiz do projeto, execute:
+No diretório do projeto, rode:
 
 ```bash
 docker-compose up -d
 ```
 
-Esse comando iniciará o LocalStack e criará automaticamente a fila `pagamento-events`.
+Isso irá subir o container do LocalStack simulando os serviços AWS (SQS, DynamoDB).
 
-### 2. Variáveis de ambiente
+---
 
-Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
+## 2. Criando recursos AWS (Fila SQS e Tabela DynamoDB) manualmente
 
-```env
-USE_LOCALSTACK=true
-SQS_PAGAMENTO_URL=http://localhost:4566/000000000000/pagamento-events
-```
-
-> Certifique-se de que o código está carregando o `.env` com `dotenv.load_dotenv()` na inicialização da aplicação.
-
-### 3. Rodar localmente
-
-Com o LocalStack rodando, execute a aplicação localmente com Uvicorn:
+### 2.1 Acessar o container LocalStack
 
 ```bash
-uvicorn interfaces.lambda_function:app --reload
+docker exec -it localstack bash
 ```
 
-A aplicação estará disponível em `http://localhost:8000/v1`
+### 2.2 Criar a fila SQS
 
-### 4. Testar o envio de um pagamento
+```bash
+awslocal sqs create-queue --queue-name pagamento-events
+```
 
-Faça uma requisição para criar um pagamento (como feito na AWS):
+Saída esperada:
+
+```json
+{
+  "QueueUrl": "http://localhost:4566/000000000000/pagamento-events"
+}
+```
+
+### 2.3 Criar a tabela DynamoDB
+
+```bash
+awslocal dynamodb create-table \
+  --table-name pagamentos \
+  --attribute-definitions AttributeName=id_pagamento,AttributeType=N \
+  --key-schema AttributeName=id_pagamento,KeyType=HASH \
+  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+```
+
+Saída esperada (informa que a tabela está sendo criada):
+
+```json
+{
+  "TableDescription": {
+    "TableStatus": "CREATING",
+    ...
+  }
+}
+```
+
+### 2.4 Confirmar que recursos foram criados
+
+```bash
+awslocal sqs list-queues
+# Deve listar a fila pagamento-events
+
+awslocal dynamodb list-tables
+# Deve listar a tabela pagamentos
+```
+
+---
+
+## 3. Configurar variáveis de ambiente para a aplicação
+
+No arquivo `.env` (ou exportando no terminal), configure:
+
+```
+USE_LOCALSTACK=true
+PAGAMENTO_QUEUE_URL=http://localhost:4566/000000000000/pagamento-events
+AWS_ACCESS_KEY_ID=fake
+AWS_SECRET_ACCESS_KEY=fake
+AWS_DEFAULT_REGION=us-east-1
+```
+
+---
+
+## 4. Rodar a aplicação FastAPI localmente
+
+```bash
+uvicorn app.lambda_function:app --reload
+```
+
+---
+
+## 5. Testar envio de pagamento via API
+
+Com o FastAPI rodando, execute:
 
 ```bash
 curl -X POST http://localhost:8000/v1/pagamentos/enviar \
   -H "Content-Type: application/json" \
-  -d '{"id_pedido": "123456", "valor": 25.90}'
+  -d '{"id_pedido": "abc123", "valor": 150.00}'
 ```
 
-### 5. Verificar mensagens na fila
+Resposta esperada: objeto JSON com confirmação do pagamento.
 
-Após um `UPDATE` de pagamento ou confirmação, você pode verificar as mensagens publicadas no SQS:
+---
+
+## 6. Verificar mensagens publicadas na fila SQS
+
+Ainda dentro do container LocalStack, execute:
 
 ```bash
-awslocal sqs receive-message \
-  --queue-url http://localhost:4566/000000000000/pagamento-events
+awslocal sqs receive-message --queue-url http://localhost:4566/000000000000/pagamento-events
+```
+
+Você verá as mensagens publicadas, com o evento `"pagamento_criado"` e os dados do pagamento.
+
+---
+
+## 7. Parar e limpar ambiente LocalStack (opcional)
+
+Para parar e remover containers e volumes, rode:
+
+```bash
+docker-compose down -v
 ```
 
 ### Estrutura de publicação de eventos
